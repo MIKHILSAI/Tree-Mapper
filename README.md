@@ -5,7 +5,8 @@ A full-stack application designed to parse, process, and visualize hierarchical 
 ## Features
 
 - **Edge Parsing & Validation**: Validates string pairs formatted as `A->B` representing directed edges.
-- **Cycle Detection**: Implements Depth-First Search (DFS) to identify and safely handle cyclic dependencies (e.g., A->B->A).
+- **Cycle Detection**: Implements Depth-First Search (DFS) to identify and safely handle cyclic dependencies 
+(e.g., A->B->A).
 - **Tree Construction**: Groups edges into connected components, identifies root nodes, and dynamically builds hierarchical tree structures.
 - **Duplicate Handling**: Identifies duplicate edges within the input data.
 - **Dynamic Visualization**: Renders an interactive, collapsible tree view of the parsed hierarchies on the frontend.
