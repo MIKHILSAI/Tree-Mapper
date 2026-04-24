@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Tree Mapper  | Edge-to-Tree Visualizer</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    body {
+        font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        background: #f4f6fc;
+        color: #0a2540;
+        padding: 28px 24px;
+    }
+    .app-wrapper {
+        max-width: 1600px;
+        margin: 0 auto;
+    }
+    .hero-area {
+        margin-bottom: 32px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 16px;
+    }
+    .brand h1 {
+        font-size: 1.9rem;
+        font-weight: 650;
+        background: linear-gradient(130deg, #0f2b3d, #1e5a7d);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        letter-spacing: -0.2px;
+    }
+    .brand p {
+        font-size: 0.85rem;
+        color: #2c5a6e;
+        margin-top: 6px;
+    }
+    .status-tag {
+        background: #eef2fa;
+        border-radius: 32px;
+        padding: 6px 16px;
+        font-size: 0.75rem;
+        color: #1a5d7a;
+        border: 1px solid #cde1ed;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .dual-layout {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 28px;
+    }
+    .request-box {
+        flex: 1.2;
+        min-width: 280px;
+        background: #ffffff;
+        border-radius: 28px;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.02), 0 2px 8px rgba(0, 0, 0, 0.05);
+        padding: 24px 26px;
+        border: 1px solid #e2edf2;
+    }
+    .insight-panel {
+        flex: 2.2;
+        min-width: 360px;
+        background: #ffffff;
+        border-radius: 28px;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.02), 0 2px 8px rgba(0, 0, 0, 0.05);
+        padding: 24px 26px;
+        border: 1px solid #e2edf2;
+    }
+    .field-group {
+        margin-bottom: 20px;
+    }
+    .field-label {
+        font-weight: 500;
+        font-size: 0.8rem;
+        display: block;
+        margin-bottom: 8px;
+        color: #2c4c6c;
+        letter-spacing: 0.3px;
+    }
+    .api-input {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid #cbdde9;
+        border-radius: 18px;
+        font-size: 0.9rem;
+        background: #fefeff;
+        transition: 0.2s;
+    }
+    .api-input:focus {
+        border-color: #2f8cbb;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(47, 140, 187, 0.15);
+    }
+    .edge-editor {
+        width: 100%;
+        font-family: 'Fira Code', 'JetBrains Mono', monospace;
+        font-size: 0.85rem;
+        padding: 14px 16px;
+        border: 1px solid #cbdde9;
+        border-radius: 20px;
+        background: #fbfdff;
+        resize: vertical;
+        line-height: 1.5;
+    }
+    .action-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin: 22px 0 14px;
+    }
+    .action-primary {
+        background: #1f6e8c;
+        border: none;
+        padding: 10px 24px;
+        border-radius: 44px;
+        font-weight: 600;
+        color: white;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        transition: 0.2s;
+        font-size: 0.9rem;
+    }
+    .action-primary:hover {
+        background: #0e5a75;
+        transform: translateY(-1px);
+    }
+    .action-secondary {
+        background: #f0f4fa;
+        border: 1px solid #d4e2ec;
+        padding: 10px 20px;
+        border-radius: 44px;
+        font-weight: 500;
+        color: #1f4e6e;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+    }
+    .validation-chip {
+        font-size: 0.7rem;
+        margin-top: 12px;
+        padding: 6px 14px;
+        background: #f0f6fa;
+        border-radius: 24px;
+        display: inline-block;
+        color: #2c6e8f;
+    }
+    .stats-dashboard {
+        background: #f8fbfe;
+        border-radius: 22px;
+        padding: 18px 20px;
+        border: 1px solid #e6f0f5;
+        margin-bottom: 28px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 12px;
+    }
+    .stat-card {
+        background: white;
+        border-radius: 34px;
+        padding: 10px 20px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
+        flex: 1;
+        text-align: center;
+    }
+    .stat-digit {
+        font-size: 1.9rem;
+        font-weight: 700;
+        color: #1d5a73;
+    }
+    .stat-caption {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        color: #4f7a92;
+    }
+    .section-header {
+        font-weight: 620;
+        font-size: 1.2rem;
+        margin: 22px 0 14px 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border-left: 4px solid #2f8cbb;
+        padding-left: 14px;
+    }
+    .cycle-badge {
+        background: #fee9e6;
+        color: #bc3900;
+        padding: 4px 12px;
+        border-radius: 40px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .hierarchy-node {
+        margin-left: 22px;
+        list-style: none;
+    }
+    .hierarchy-root {
+        margin-left: 0;
+    }
+    .node-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 8px;
+        border-radius: 14px;
+        transition: background 0.1s;
+    }
+    .node-row:hover {
+        background: #eef3fc;
+    }
+    .expand-toggle {
+        width: 26px;
+        font-size: 0.8rem;
+        color: #2f8cbb;
+    }
+    .node-name {
+        font-weight: 500;
+    }
+    .depth-pill {
+        font-size: 0.65rem;
+        background: #e0edf5;
+        border-radius: 40px;
+        padding: 2px 10px;
+        margin-left: 12px;
+        color: #1d6281;
+    }
+    .invalid-block {
+        background: #fff8ef;
+        border-left: 3px solid #f4a261;
+        padding: 14px;
+        border-radius: 18px;
+        margin: 12px 0;
+    }
+    .raw-json-toggle {
+        cursor: pointer;
+        user-select: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 8px;
+    }
+    .json-viewer {
+        background: #1a2c38;
+        color: #d9eaf3;
+        padding: 16px;
+        border-radius: 20px;
+        font-family: monospace;
+        font-size: 0.72rem;
+        overflow-x: auto;
+        margin-top: 14px;
+    }
+    .error-container {
+        background: #fee9e9;
+        border-left: 5px solid #e15554;
+        padding: 16px;
+        border-radius: 20px;
+        color: #aa2e1e;
+    }
+    .spinner-small {
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        border: 2px solid white;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+    hr {
+        margin: 18px 0;
+        border-color: #e6edf2;
+    }
+    button:focus-visible {
+        outline: 2px solid #1f6e8c;
+        outline-offset: 2px;
+    }
+    @media (max-width: 700px) {
+        body {
+            padding: 18px;
+        }
+        .stats-dashboard {
+            flex-direction: column;
+        }
+    }
+    ul[role="tree"] {
+        padding-left: 0;
+    }
+</style>
+</head>
+<body>
+<div class="app-wrapper">
+    <div class="hero-area">
+        <div class="brand">
+            <h1><i class="fas fa-project-diagram"></i> Tree Mapper </h1>
+            <p>Edge chain analysis · Rooted trees · Cycle detection</p>
+        </div>
+        <div class="status-tag">
+            <i class="fas fa-cloud-upload-alt"></i> Live parser
+        </div>
+    </div>
+    <div class="dual-layout">
+        <div class="request-box">
+            <div class="field-group">
+                <label class="field-label"><i class="fas fa-server"></i> Gateway endpoint</label>
+                <input type="text" id="gatewayUrl" class="api-input" placeholder="http://localhost:3000" value="http://localhost:3000">
+                <div class="validation-chip"><i class="fas fa-arrow-right"></i> POST /bfhl will be used automatically</div>
+            </div>
+            <label class="field-label"><i class="fas fa-code-branch"></i> Edge definitions</label>
+            <textarea id="edgeSource" rows="7" class="edge-editor" placeholder="A->B&#10;B->C&#10;C->D"></textarea>
+            <div class="action-bar">
+                <button id="processBtn" class="action-primary"><i class="fas fa-arrow-right-to-bracket"></i> Process</button>
+                <button id="sampleBtn" class="action-secondary"><i class="fas fa-chart-simple"></i> Load sample</button>
+            </div>
+            <div class="validation-chip" id="hintMessage">
+                <i class="fas fa-lightbulb"></i> Client side check: well-formed arrows
+            </div>
+        </div>
+        <div class="insight-panel" id="resultArea">
+            <div style="text-align: center; padding: 48px 20px; color: #96b7cf;">
+                <i class="fas fa-sitemap" style="font-size: 38px;"></i>
+                <p style="margin-top: 14px;">Submit edge definitions to visualize hierarchies and detect conflicts</p>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    const gatewayInput = document.getElementById('gatewayUrl');
+    const edgeTextarea = document.getElementById('edgeSource');
+    const processAction = document.getElementById('processBtn');
+    const sampleAction = document.getElementById('sampleBtn');
+    const outputContainer = document.getElementById('resultArea');
+    let activeRequest = false;
+    function extractEdgesFromText(raw) {
+        const lines = raw.split(/\r?\n/);
+        let collected = [];
+        for (let ln of lines) {
+            let trimmed = ln.trim();
+            if (trimmed === "") continue;
+            const segments = trimmed.split(',').map(part => part.trim());
+            for (let seg of segments) {
+                if (seg.includes("->")) {
+                    collected.push(seg);
+                } else if (seg !== "") {
+                    collected.push(seg);
+                }
+            }
+        }
+        return collected;
+    }
+    function generateEdgeWarnings(edgeList) {
+        let warnings = [];
+        for (let edge of edgeList) {
+            if (edge.includes("->")) {
+                const [src, tgt] = edge.split("->").map(p => p.trim());
+                if (src === tgt) warnings.push(` self-loop: ${edge}`);
+                if (!/^[A-Za-z0-9]+$/.test(src) || !/^[A-Za-z0-9]+$/.test(tgt)) warnings.push(` symbol irregular: ${edge}`);
+            } else {
+                if (edge.length > 0) warnings.push(` missing arrow (->): ${edge}`);
+            }
+        }
+        return warnings;
+    }
+    function updateClientEdgeFeedback(edges) {
+        const hintDiv = document.getElementById('hintMessage');
+        const warns = generateEdgeWarnings(edges);
+        if (warns.length === 0) {
+            hintDiv.innerHTML = `<i class="fas fa-check-circle"></i> Structure valid — ready for transmission`;
+            hintDiv.style.color = "#2c6a47";
+        } else {
+            hintDiv.innerHTML = `<i class="fas fa-info-circle"></i> ${warns.slice(0, 2).join(' · ')}${warns.length > 2 ? ' ...' : ''} (will still send)`;
+            hintDiv.style.color = "#bc5a2c";
+        }
+    }
+    function buildTreeVisual(rootId, depthVal, childrenMap) {
+        function buildBranch(nodeKey, currentDepth, pathNodes = new Set()) {
+            if (pathNodes.has(nodeKey)) {
+                const cycleSpan = document.createElement('span');
+                cycleSpan.className = "cycle-badge";
+                cycleSpan.innerHTML = `<i class="fas fa-sync-alt"></i> cycle reference`;
+                return cycleSpan;
+            }
+            const updatedPath = new Set(pathNodes);
+            updatedPath.add(nodeKey);
+            const liElem = document.createElement('li');
+            liElem.setAttribute('role', 'treeitem');
+            const rowDiv = document.createElement('div');
+            rowDiv.className = "node-row";
+            const toggleSpan = document.createElement('span');
+            toggleSpan.className = "expand-toggle";
+            const childList = childrenMap.get(nodeKey) || [];
+            const hasChildren = childList.length > 0;
+            if (hasChildren) {
+                toggleSpan.innerHTML = '<i class="fas fa-chevron-down"></i>';
+                toggleSpan.style.cursor = "pointer";
+            } else {
+                toggleSpan.innerHTML = '<i class="fas fa-circle" style="font-size: 0.45rem; opacity:0.6;"></i>';
+            }
+            const titleSpan = document.createElement('span');
+            titleSpan.className = "node-name";
+            titleSpan.innerText = nodeKey;
+            rowDiv.appendChild(toggleSpan);
+            rowDiv.appendChild(titleSpan);
+            if (depthVal !== undefined && currentDepth !== undefined) {
+                const depthChip = document.createElement('span');
+                depthChip.className = "depth-pill";
+                depthChip.innerText = `depth ${currentDepth}`;
+                rowDiv.appendChild(depthChip);
+            }
+            liElem.appendChild(rowDiv);
+            if (hasChildren) {
+                const nestedUl = document.createElement('ul');
+                nestedUl.setAttribute('role', 'group');
+                nestedUl.style.listStyle = "none";
+                nestedUl.style.paddingLeft = "22px";
+                for (let child of childList) {
+                    const childNode = buildBranch(child, currentDepth + 1, updatedPath);
+                    nestedUl.appendChild(childNode);
+                }
+                liElem.appendChild(nestedUl);
+                toggleSpan.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isCollapsed = nestedUl.style.display === 'none';
+                    nestedUl.style.display = isCollapsed ? 'block' : 'none';
+                    toggleSpan.innerHTML = isCollapsed ? '<i class="fas fa-chevron-down"></i>' : '<i class="fas fa-chevron-right"></i>';
+                    liElem.setAttribute('aria-expanded', isCollapsed);
+                });
+            }
+            return liElem;
+        }
+        const outerUl = document.createElement('ul');
+        outerUl.setAttribute('role', 'tree');
+        outerUl.className = "hierarchy-root";
+        const rootNode = buildBranch(rootId, 0);
+        outerUl.appendChild(rootNode);
+        return outerUl;
+    }
+    function renderApiResponse(payload) {
+        if (!payload || typeof payload !== 'object') {
+            outputContainer.innerHTML = `<div class="error-container"><i class="fas fa-exclamation-triangle"></i> Unexpected response format</div>`;
+            return;
+        }
+        const hierarchies = payload.hierarchies || [];
+        const invalidList = payload.invalid_entries || [];
+        const duplicateEdges = payload.duplicate_edges || [];
+        const summaryInfo = payload.summary || { total_trees: 0, total_cycles: 0, largest_tree_root: "—" };
+        let mainHtml = `
+            <div class="stats-dashboard">
+                <div class="stat-card"><div class="stat-digit">${summaryInfo.total_trees ?? 0}</div><div class="stat-caption"> Total trees</div></div>
+                <div class="stat-card"><div class="stat-digit">${summaryInfo.total_cycles ?? 0}</div><div class="stat-caption"> Cyclic groups</div></div>
+                <div class="stat-card"><div class="stat-digit">${summaryInfo.largest_tree_root ?? '—'}</div><div class="stat-caption"> Largest root</div></div>
+            </div>
+            <div class="section-header"><i class="fas fa-diagram-tree"></i> Hierarchies & rooted forests</div>
+            <div id="treeMountPoint"></div>
+        `;
+        if (invalidList.length > 0) {
+            mainHtml += `<div class="section-header"><i class="fas fa-filter" style="color:#e67e22;"></i> Rejected entries (${invalidList.length})</div><div class="invalid-block"><ul>`;
+            invalidList.forEach(item => { mainHtml += `<li><i class="fas fa-ban"></i> ${escapeXml(item)}</li>`; });
+            mainHtml += `</ul></div>`;
+        } else {
+            mainHtml += `<div class="section-header"><i class="fas fa-check-circle"></i> Invalid entries</div><div style="font-size:0.85rem; padding-left: 18px;"> No malformed edges</div>`;
+        }
+        if (duplicateEdges.length > 0) {
+            mainHtml += `<div class="section-header"><i class="fas fa-clone"></i> Duplicate submissions (${duplicateEdges.length})</div><div class="invalid-block"><ul>`;
+            duplicateEdges.forEach(dup => { mainHtml += `<li><i class="fas fa-copy"></i> ${escapeXml(dup)}</li>`; });
+            mainHtml += `</ul></div>`;
+        } else {
+            mainHtml += `<div class="section-header"><i class="fas fa-check-double"></i> Duplicate edges</div><div style="font-size:0.85rem; padding-left: 18px;"> No duplicates found</div>`;
+        }
+        mainHtml += `<hr><div class="raw-json-toggle" id="rawToggleBtn"><i class="fas fa-brackets-curly"></i>  View raw API payload (click to expand/collapse)</div><div id="rawBlockSegment" style="display:none;"><div class="json-viewer"><pre>${escapeXml(JSON.stringify(payload, null, 2))}</pre></div></div>`;
+        outputContainer.innerHTML = mainHtml;
+        const treeMount = document.getElementById('treeMountPoint');
+        if (treeMount && hierarchies.length) {
+            treeMount.innerHTML = '';
+            for (let treeEntry of hierarchies) {
+                const rootId = treeEntry.root;
+                const maxDepth = treeEntry.depth;
+                const cyclicFlag = treeEntry.has_cycle === true;
+                const treeStructure = treeEntry.tree;
+                const wrapperCard = document.createElement('div');
+                wrapperCard.style.marginBottom = '24px';
+                wrapperCard.style.border = '1px solid #e2edf5';
+                wrapperCard.style.borderRadius = '22px';
+                wrapperCard.style.padding = '14px 18px';
+                wrapperCard.style.backgroundColor = '#ffffff';
+                const headingDiv = document.createElement('div');
+                headingDiv.style.display = 'flex';
+                headingDiv.style.alignItems = 'center';
+                headingDiv.style.gap = '14px';
+                headingDiv.style.marginBottom = '12px';
+                headingDiv.style.flexWrap = 'wrap';
+                headingDiv.innerHTML = `<strong><i class="fas fa-seedling"></i> root: ${escapeXml(rootId)}</strong> ${maxDepth !== undefined ? `<span class="depth-pill">depth ${maxDepth}</span>` : ''} ${cyclicFlag ? '<span class="cycle-badge"><i class="fas fa-sync-alt"></i> Cycle inside component</span>' : ''}`;
+                wrapperCard.appendChild(headingDiv);
+                if (!cyclicFlag && treeStructure && typeof treeStructure === 'object') {
+                    const childrenMap = new Map();
+                    function traverseTree(nodeObj, parentNode) {
+                        for (const [childId, subTree] of Object.entries(nodeObj)) {
+                            if (!childrenMap.has(parentNode)) childrenMap.set(parentNode, []);
+                            childrenMap.get(parentNode).push(childId);
+                            if (subTree && typeof subTree === 'object' && Object.keys(subTree).length > 0) {
+                                traverseTree(subTree, childId);
+                            }
+                        }
+                    }
+                    traverseTree(treeStructure, rootId);
+                    const visualTree = buildTreeVisual(rootId, maxDepth, childrenMap);
+                    wrapperCard.appendChild(visualTree);
+                } else if (cyclicFlag) {
+                    const cycleWarning = document.createElement('div');
+                    cycleWarning.className = "cycle-badge";
+                    cycleWarning.innerHTML = `<i class="fas fa-infinity"></i> Cyclic reference — tree branch collapsed`;
+                    wrapperCard.appendChild(cycleWarning);
+                }
+                treeMount.appendChild(wrapperCard);
+            }
+        } else if (treeMount && hierarchies.length === 0) {
+            treeMount.innerHTML = `<div class="invalid-block" style="text-align:center;"><i class="fas fa-info-circle"></i> No hierarchical trees returned — check node connections</div>`;
+        }
+        const rawToggle = document.getElementById('rawToggleBtn');
+        const rawSegment = document.getElementById('rawBlockSegment');
+        if (rawToggle && rawSegment) {
+            rawToggle.addEventListener('click', () => {
+                const visible = rawSegment.style.display === 'block';
+                rawSegment.style.display = visible ? 'none' : 'block';
+                rawToggle.innerHTML = visible ? '<i class="fas fa-brackets-curly"></i>  View raw API payload (click to expand)' : '<i class="fas fa-brackets-curly"></i>  Hide raw response';
+            });
+        }
+    }
+    function escapeXml(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>]/g, function(match) {
+            if (match === '&') return '&amp;';
+            if (match === '<') return '&lt;';
+            if (match === '>') return '&gt;';
+            return match;
+        });
+    }
+    async function transmitToEngine(edgePayload) {
+        let baseEndpoint = gatewayInput.value.trim();
+        if (!baseEndpoint) throw new Error("Gateway URL cannot be empty");
+        let cleanEndpoint = baseEndpoint;
+        if (!cleanEndpoint.endsWith('/')) cleanEndpoint = cleanEndpoint + '/';
+        cleanEndpoint = cleanEndpoint + 'bfhl';
+        const res = await fetch(cleanEndpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ data: edgePayload })
+        });
+        if (!res.ok) {
+            let errText = `HTTP error ${res.status}`;
+            try {
+                const errorJson = await res.json();
+                errText = errorJson.message || errorJson.error || errText;
+            } catch (_) { }
+            throw new Error(`Server responded: ${errText}`);
+        }
+        return await res.json();
+    }
+    async function startProcessing() {
+        if (activeRequest) return;
+        const rawInput = edgeTextarea.value;
+        const parsedEdges = extractEdgesFromText(rawInput);
+        if (parsedEdges.length === 0) {
+            outputContainer.innerHTML = `<div class="error-container"><i class="fas fa-exclamation-circle"></i> Please provide at least one edge definition (example: A->B)</div>`;
+            return;
+        }
+        updateClientEdgeFeedback(parsedEdges);
+        activeRequest = true;
+        processAction.disabled = true;
+        processAction.innerHTML = `<span class="spinner-small"></span> Analyzing...`;
+        outputContainer.innerHTML = `<div style="text-align:center; padding: 44px;"><span class="spinner-small" style="border-color:#1f6e8c; border-top-color:white;"></span><span style="margin-left: 12px;">Contacting hierarchy engine…</span></div>`;
+        try {
+            const apiResult = await transmitToEngine(parsedEdges);
+            renderApiResponse(apiResult);
+        } catch (err) {
+            let msg = err.message;
+            if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+                msg = `Connection failure: cannot reach ${gatewayInput.value}. Ensure backend service is active. (${err.message})`;
+            }
+            outputContainer.innerHTML = `<div class="error-container"><i class="fas fa-skull-crosswalk"></i> ${escapeXml(msg)}<div style="margin-top: 14px;"><button id="retrySender" class="action-secondary" style="background:#fcf2e1;"><i class="fas fa-rotate-right"></i> Retry request</button></div></div>`;
+            const retryButton = document.getElementById('retrySender');
+            if (retryButton) retryButton.onclick = () => startProcessing();
+        } finally {
+            activeRequest = false;
+            processAction.disabled = false;
+            processAction.innerHTML = `<i class="fas fa-arrow-right-to-bracket"></i> Process`;
+        }
+    }
+    function injectExample() {
+        edgeTextarea.value = `A->B\nB->C\nC->D\nX->Y\nY->Z\nM->N\nN->M\nAlpha->Beta\nBeta->Gamma`;
+        const edgesNow = extractEdgesFromText(edgeTextarea.value);
+        updateClientEdgeFeedback(edgesNow);
+    }
+    processAction.addEventListener('click', startProcessing);
+    sampleAction.addEventListener('click', injectExample);
+    const initialEdges = extractEdgesFromText(edgeTextarea.value);
+    updateClientEdgeFeedback(initialEdges);
+</script>
+</body>
+</html>

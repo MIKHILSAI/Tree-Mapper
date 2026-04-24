@@ -1,0 +1,20 @@
+{
+  "name": "bfhl-fullstack",
+  "version": "1.0.0",
+  "description": "BFHL API with frontend visualizer",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js",
+    "serve-frontend": "npx serve frontend",
+    "dev:full": " concurrently \"npm run dev\" \"npm run serve-frontend\" "
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0",
+    "serve": "^14.2.0"
+  }
+}
